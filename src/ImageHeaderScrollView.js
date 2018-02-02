@@ -218,6 +218,7 @@ class ImageHeaderScrollView extends Component<Props, State> {
       renderForeground,
       renderHeader,
       renderTouchableFixedForeground,
+      onScrollCallback,
       ...scrollViewProps
     } = this.props;
 
@@ -237,14 +238,15 @@ class ImageHeaderScrollView extends Component<Props, State> {
         onLayout={this.onContainerLayout}
       >
         {this.renderHeader()}
-        <Animated.View style={[styles.container, { transform: [{ translateY: topMargin }] }]}>
+        <Animated.View style={[styles.container, { transform: [{ translateY: topMargin }] }, this.props.childrenContainer]}>
           <ScrollView
             ref={ref => (this.scrollViewRef = ref)}
             style={styles.container}
             scrollEventThrottle={16}
-            onScroll={Animated.event([
-              { nativeEvent: { contentOffset: { y: this.state.scrollY } } },
-            ])}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
+              { listener: event => { onScrollCallback && onScrollCallback() }}
+            )}
             {...scrollViewProps}
           >
             <Animated.View style={childrenContainerStyle}>
@@ -273,7 +275,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    overflow: 'hidden',
   },
   headerChildren: {
     backgroundColor: 'transparent',
